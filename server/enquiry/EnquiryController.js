@@ -100,6 +100,7 @@ deleteEnquiry=(req,res)=>{
                 status:200,
                 success:true,
                 message:"Enquiry deleted",
+                data:result
             })
         })
         .catch((err)=>{
