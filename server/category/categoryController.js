@@ -1,4 +1,3 @@
-const { log } = require("console")
 const category=require("./categoryModel")
 const fs=require("fs")
 addCategory=(req,res)=>{
@@ -9,9 +8,9 @@ addCategory=(req,res)=>{
     if(!req.body.description){
         validation.push("description is required")
     }
-    if(!req.body.brandId){
-        validation.push("Brand Id is required")
-    }
+    // if(!req.body.brandId){
+    //     validation.push("Brand Id is required")
+    // }
     if(!req.file){
         validation.push("Category is required")
     }
@@ -91,14 +90,14 @@ addCategory=(req,res)=>{
 //         })
 //     })
 // }
-getAllCategory = async (req,res)=>{
+getAllCategory = (req,res)=>{
     category.find().populate("brandId")
-    let total = await category.countDocuments().exec()
-    console.log(total)
+    // let total = await category.countDocuments().exec()
+    // console.log(total)
     category.find(req.body)
-    .sort({createdAt : -1})
-    .skip(2)
-    .limit(1)
+    // .sort({createdAt : -1})
+    // .skip(2)
+    // .limit(1)
     .then((result)=>{
         res.json({
             status:200,
@@ -249,7 +248,6 @@ updateCategory=(req,res)=>{
                     fs.unlinkSync(filepath)
                     categoryData.category="categories/"+req.file.filename
                 }
-                
                 categoryData.save()
                 .then((updateData)=>{
                     res.json({

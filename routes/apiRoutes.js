@@ -48,7 +48,7 @@ const brandStorage = multer.diskStorage({
     }
 })
 const brandUpload = multer({ storage: brandStorage })
-router.post("/addBrand",brandUpload.array("brandLogo"), brandController.addBrand)
+router.post("/addBrand",brandUpload.single("brandLogo"), brandController.addBrand)
 // router.post("/deleteBrand", brandController.deleteBrand)
 // router.delete("/deleteByParam/:_id", brandController.deleteBrandByParam)
 router.post("/updateBrand", brandUpload.array("brandLogo"), brandController.updateBrand)
@@ -66,9 +66,6 @@ const productStorage = multer.diskStorage({
 })
 const productUpload = multer({storage: productStorage})
 router.post("/addProduct", productUpload.single("productImages"), productController.addProduct)
-
-// router.post("/deleteProduct", productController.deleteProduct)
-// router.get("/deleteByParam/:_id", productController.deleteProductByParam)
 router.post("/updateProduct", productController.updateProduct)
 router.post("/softDeleteProduct", productController.softDeleteProduct)
 
@@ -85,8 +82,6 @@ const categoryStorage = multer.diskStorage({
 
 const categoryUpload = multer({storage: categoryStorage})
 router.post("/addCategory", categoryUpload.single("categoryImages"), categoryController.addCategory)
-// router.post("/deleteCategory", categoryController.deleteCategory)
-// router.delete("/deleteByParam/:_id", categoryController.deleteCategoryByParam)
 router.post("/updateCategory", categoryUpload.single("category"), categoryController.updateCategory)
 router.post("/softDeleteCategory", categoryController.softDeleteCategory)
 

@@ -44,7 +44,7 @@ login=(req,res)=>{
                     userId:userData._id,
                     userType:userData.userType
                 }
-                let token=jwt.sign(payload, PRIVATE_KEY,{expiresIn:"24h"})
+                let token=jwt.sign(payload, PRIVATE_KEY)
                 // let decryptToken = jwt.verify(token,PRIVATE_KEY);
                 res.json({
                     success:true,

@@ -1,5 +1,6 @@
 
 const product = require("./productModel")
+const fs=require("fs")
 addProduct=(req,res)=>{
     // console.log(req.body);
     let validation=[]
@@ -15,12 +16,15 @@ addProduct=(req,res)=>{
     if(!req.body.price){
         validation.push("price is Required")
     }
-    if(req.files.length<=0){
-        validation.push("Image is required")
+    if(!req.file){
+        validation.push("Product Image is required")
     }
-    // if(!req.body.categoryId){
-    //     validation.push("Category Id is required")
+    // if(req.files.length<=0){
+    //     validation.push("Product Image is required")
     // }
+    if(!req.body.categoryId){
+        validation.push("Category Id is required")
+    }
     if(validation.length>0){
         res.json({
             status:422,
@@ -38,12 +42,12 @@ addProduct=(req,res)=>{
             productObj.size=req.body.size
             productObj.categoryId=req.body.categoryId;
             // console.log(req.files);
-            req.files.forEach((el, index)=>{
-                console.log(el.filename)
-                let filename="products/"+el.filename
-                productObj.productImages.push(filename)
-            })
-            // productObj.product="products/"+req.files.filename
+            // req.files.forEach((el, index)=>{
+            //     console.log(el.filename)
+            //     let filename="products/"+el.filename
+            //     productObj.productImages.push(filename)
+            // })
+            productObj.productImage="products/"+req.file.filename
             productObj.save()
             .then((productData)=>{
                 res.json({
@@ -258,6 +262,11 @@ updateProduct=(req,res)=>{
                 }
                 if(req.body.price){
                     productData.price=req.body.price
+                }
+                if(req.file){ 
+                    let filepath="public/"+productData.productImage
+                    fs.unlinkSync(filepath)
+                    productData.productImage="products/"+req.file.filename
                 }
                 productData.save()
                 .then((updateData)=>{

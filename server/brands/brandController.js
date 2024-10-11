@@ -1,4 +1,5 @@
 const brand = require("./brandModel")
+const fs=require('fs')
 addBrand=(req,res)=>{
     let validation=[]
     if(!req.body.brandName){
@@ -7,7 +8,7 @@ addBrand=(req,res)=>{
     if(!req.body.description){
         validation.push('description is Required')
     }
-    if(req.file){
+    if(!req.file){
         validation.push("Brand Logo is require")
     }
     if(validation.length>0){
@@ -229,9 +230,10 @@ updateBrand=(req,res)=>{
                         brandData.description=req.body.description
                     }
                     if(req.file){
-                        brandData.bandLogo="brands"+req.file.filename
+                        let filepath="public/"+brandData.brandLogo
+                        fs.unlinkSync(filepath)
+                        brandData.bandLogo="brands/"+req.file.filename
                     }
-                   
                     brandData.save()
                     .then((updateData)=>{
                         res.json({
