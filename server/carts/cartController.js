@@ -81,7 +81,8 @@ addToCart=(req,res)=>{
     }   
 }
 getAllCart=(req,res)=>{
-    cart.find({userId:req.body.userId})
+    // cart.find({userId:req.body.userId})
+    cart.find(req.body)
     .then((result)=>{
         if(result.length>0){
             res.json({
