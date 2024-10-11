@@ -11,7 +11,7 @@ addEnquiry=(req,res)=>{
         validation.push("Subject is required")
     }
     if(!req.body.message){
-        validation.push("Name is required")
+        validation.push("Message is required")
     }
     if(validation.length>0){
         res.json({
