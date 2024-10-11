@@ -18,11 +18,11 @@ login=(req,res)=>{
             message:validation
         })
     }
-    console.log(req.body.email);
+    // console.log(req.body.email);
     
     user.findOne({email:req.body.email})
     .then((userData)=>{
-        console.log(userData);
+        // console.log(userData);
         
         if(!userData){
             res.json({
@@ -73,9 +73,9 @@ login=(req,res)=>{
 } 
 changePassword=(req,res)=>{
     let validation=[]
-    // if(!req.body.userId){
-    //     validation.push("User Id is required")
-    // }
+    if(!req.body.userId){
+        validation.push("User Id is required")
+    }
     if(!req.body.oldPassword){
         validation.push("Old password is required")
     }
@@ -99,7 +99,7 @@ changePassword=(req,res)=>{
                 message:"Confirm Password and new password don't match"
             })
         }else{
-            user.findOne({_id:req.body.userData.userId})
+            user.findOne({_id:req.body.userId})
             .then((userData)=>{
                 if(!userData){
                     res.json({
