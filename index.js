@@ -19,7 +19,7 @@ app.listen(PORT, ()=>{
 })
 //method- get, post, put, patch, delete
 //get- not secure
-app.get("/myname", (req, res)=>{
+app.get("/", (req, res)=>{
 
     res.json({
         message:"gaurav lagah",
@@ -27,20 +27,7 @@ app.get("/myname", (req, res)=>{
         success:true
     })
 })
-app.post("/firstapi", (req, res)=>{
-    res.json({
-        message:"this is my first project",
-        status:200,
-        success:true
-    })
-})
-app.post("/hobbies", (req,res)=>{
-    res.json({
-        message: "watching sports entertainment channel, playing cricket",
-        status:200,
-        success:true
-    })
-})
+
 //postman- api testing interface
 //api= application programming interface, mediator for frontend and backend
 //node js- backend- hindi
