@@ -35,6 +35,7 @@ addToCart=(req,res)=>{
                 res.json({
                     status:200,
                     success:true,
+                    update:false,
                     message:"Added to Cart Successfully",
                     data:cartResult
                 })
@@ -55,6 +56,7 @@ addToCart=(req,res)=>{
                     res.json({
                         status:200,
                         success:true,
+                        update:true,
                         message:"Cart Updated Successfully",
                         data:cartResult
                     }) 
@@ -80,15 +82,22 @@ addToCart=(req,res)=>{
         }) 
     }   
 }
-getAllCart=(req,res)=>{
-    // cart.find({userId:req.body.userId})
-    cart.find(req.body)
+getAllCart= async(req,res)=>{
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
+    let total = await cart.countDocuments({userId:req.body.userId}).exec()
+    delete req.body.limit
+    delete req.body.currentPage
+    cart.find({userId:req.body.userId}).populate("productId")
+    .limit(limit)
+    .skip(currentPage*limit)
     .then((result)=>{
         if(result.length>0){
             res.json({
                 status:200,
                 success:true,
                 message:"Cart Loaded",
+                total:total,
                 data:result
             })
         }else{
@@ -170,12 +179,12 @@ updateCart=(req,res)=>{
                 })
             }else{
                 if(req.body.quantity){
-                    cartData.quantity=req.body.quantity
+                    cartData.quantity=parseInt(req.body.quantity)
                 }
                 if(req.body.price){
                     cartData.price=req.body.price
                 }
-                    cartData.total=req.body.quantity*req.body.price
+                    cartData.total=parseInt(req.body.quantity)*parseInt(req.body.price)
                 
                 cartData.save()
                 .then((updateData)=>{

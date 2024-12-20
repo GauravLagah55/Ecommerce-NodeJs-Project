@@ -10,10 +10,10 @@ const dashboardController=require("../server/dashboard/DashboardController")
 const orderController=require("../server/order/OrderController")
 
 // router.method("/path", controller.module)
-router.post("/getAllBrand", brandController.getAllBrand)
+router.post("/getAllBrands", brandController.getAllBrand)
 router.post('/getSingleBrand', brandController.getSingleBrand)
 
-router.post("/getAllProduct", productController.getAllProduct)
+router.post("/getAllProducts", productController.getAllProduct)
 router.post("/getSingleProduct", productController.getSingleProduct)
 
 
@@ -38,62 +38,38 @@ router.post("/login", userController.login)
 router.use(require("../config/midddleware"))
 
 //brand apis
-const brandStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './public/brands/')
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-      cb(null, file.fieldname + '-' + uniqueSuffix + file.originalname)
-    }
-})
-const brandUpload = multer({ storage: brandStorage })
-router.post("/addBrand",brandUpload.single("brandLogo"), brandController.addBrand)
-// router.post("/deleteBrand", brandController.deleteBrand)
-// router.delete("/deleteByParam/:_id", brandController.deleteBrandByParam)
-router.post("/updateBrand", brandUpload.array("brandLogo"), brandController.updateBrand)
-router.post("/softDeleteBrand", brandController.softDeleteBrand)
+
+router.post("/addBrand", brandController.addBrand)
+router.delete("/deleteByParam/:_id", brandController.deleteBrandByParam)
+router.post("/updateBrand", brandController.updateBrand)
+router.post("/changeStatus", brandController.changeStatus)
 
 //product apis
-const productStorage = multer.diskStorage({
-    destination: function (req, file, cb){
-      cb(null, "./public/products/")
-    },
-    filename: function(req, file, cb){
-      const uniqueSuffix= Date.now() + "-" + Math.round(Math.random() * 1E9)
-      cb(null, file.fieldname + '-' + uniqueSuffix + file.originalname)
-    }
-})
-const productUpload = multer({storage: productStorage})
-router.post("/addProduct", productUpload.single("productImages"), productController.addProduct)
+
+
+router.post("/addProduct", productController.addProduct)
 router.post("/updateProduct", productController.updateProduct)
-router.post("/softDeleteProduct", productController.softDeleteProduct)
+router.post("/changeStatus", productController.changeStatus)
 
 //category apis
-const categoryStorage = multer.diskStorage({
-  destination: function (req, file, cb){
-    cb(null, "./public/categories/")
-  },
-  filename: function(req, file, cb){
-    const uniqueSuffix= Date.now() + "-" + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix + file.originalname)
-  }
-})
 
-const categoryUpload = multer({storage: categoryStorage})
-router.post("/addCategory", categoryUpload.single("categoryImages"), categoryController.addCategory)
-router.post("/updateCategory", categoryUpload.single("category"), categoryController.updateCategory)
-router.post("/softDeleteCategory", categoryController.softDeleteCategory)
+
+router.post("/addCategory",  categoryController.addCategory)
+router.post("/updateCategory", categoryController.updateCategory)
+router.post("/changeStatus", categoryController.changeStatus)
 
 //customer or user api 
 router.post("/changePassword", userController.changePassword)
-router.post("/getAllUser", userController.getAllUser)
+router.post("/getAllUsers", userController.getAllUser)
 router.post("/getSingleUser", userController.getSingleUser)
+router.post("/getSingleCustomer", customerController.getSingleCustomer)
+router.post("/getAllCustomers", customerController.getAllCustomers)
+router.post("/updateCustomer", customerController.updateCustomer)
 router.post("/updateUser", userController.updateUser)
 
 //cart api
 router.post("/addToCart", cartController.addToCart)
-router.post("/getAllCart", cartController.getAllCart)
+router.post("/getAllCarts", cartController.getAllCart)
 router.post("/getSingleCart", cartController.getSingleCart)
 router.post("/updateCart", cartController.updateCart)
 router.post("/deleteCart", cartController.deleteCart)
@@ -103,7 +79,7 @@ router.get("/dashboard", dashboardController.dashboard)
 
 //order apis
 router.post("/addOrder", orderController.addOrder)
-router.post("/getAllOrder", orderController.getAllOrder)
+router.post("/getAllOrders", orderController.getAllOrders)
 router.post("/getSingleOrder", orderController.getSingleOrder)
 router.post("/updateOrder", orderController.updateOrder)
 

@@ -146,13 +146,21 @@ changePassword=(req,res)=>{
         }
     }
 }
-getAllUser=(req,res)=>{
+getAllUser=async (req,res)=>{
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
+    let total = await user.countDocuments().exec()
+    delete req.body.limit
+    delete req.body.currentPage
     user.find()
+    .limit(limit)
+    .skip(currentPage*limit)
     .then((userData)=>{
         res.json({
             status:200,
             success:true,
             message:"Data loaded",
+            total:total,
             data:userData
         })
     })

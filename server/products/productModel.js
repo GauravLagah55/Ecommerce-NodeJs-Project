@@ -10,6 +10,7 @@ const productSchema=mongoose.Schema({
     // productImages:[{type:String, default:"no-pic.jpg"}],
     productImage:{type:String, default:"no-pic.jpg"},
     categoryId:{type:mongoose.Schema.Types.ObjectId, ref:"categoryModel", default:null},
+    brandId:{type:mongoose.Schema.Types.ObjectId, ref:"brandModel", default:null},
     status:{type:Boolean, default:true},
     createdAt:{type:Date, default:Date.now()}
 

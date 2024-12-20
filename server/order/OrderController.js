@@ -24,7 +24,7 @@ addOrder=(req,res)=>{
                 let totalPrice=0
                 let orderDetail=[]
                 cartData.forEach((el,index)=>{
-                    // console.log(el.quantity, el.price)
+                    console.log(el.quantity, el.price)
                     totalPrice+=el.total
                     orderDetail.push({productId:el.productId, quantity:el.quantity, price:el.price, total:el.total})
                 })
@@ -78,13 +78,22 @@ addOrder=(req,res)=>{
         })
     }
 }
-getAllOrder=(req,res)=>{
+getAllOrders=async (req,res)=>{
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
+    let total = await order.countDocuments().exec()
+    delete req.body.limit
+    delete req.body.currentPage
     order.find({userId:req.body.userId})
+    order.find(req.body).populate("userId")
+    .limit(limit)
+    .skip(currentPage*limit)
     .then((result)=>{
             res.json({
                 status:200,
                 success:true,
                 message:"Order Loaded",
+                total:total,
                 data:result
             }) 
     })
@@ -109,7 +118,7 @@ getSingleOrder=(req,res)=>{
             message:validation
         })
     }else{
-        order.findOne({_id:req.body._id})
+        order.findOne({_id:req.body._id}).populate("orderDetails.productId")
         .then((orderData)=>{
             if(!orderData){
                 res.json({
@@ -190,4 +199,4 @@ updateOrder=(req,res)=>{
         }) 
     }
 }
-module.exports={addOrder, getAllOrder, getSingleOrder, updateOrder}
+module.exports={addOrder, getAllOrders, getSingleOrder, updateOrder}

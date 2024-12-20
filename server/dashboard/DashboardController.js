@@ -5,7 +5,11 @@ const user=require("../users/userModel")
 const order=require("../order/OrderModel")
 dashboard=async(req,res)=>{
     let brandTotal=0
+    let categoryTotal=0
+    let productTotal=0
     let userTotal=0
+    let orderTotal=0
+   
     brandTotal=await brand.countDocuments({status:true}).exec()
     categoryTotal=await category.countDocuments().exec()
     productTotal=await product.countDocuments().exec()

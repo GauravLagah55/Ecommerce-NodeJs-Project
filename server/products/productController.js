@@ -16,15 +16,17 @@ addProduct=(req,res)=>{
     if(!req.body.price){
         validation.push("price is Required")
     }
-    if(!req.file){
+    if(!req.body.productImage){
         validation.push("Product Image is required")
     }
-    // if(req.files.length<=0){
-    //     validation.push("Product Image is required")
-    // }
+    
     if(!req.body.categoryId){
         validation.push("Category Id is required")
     }
+    if(!req.body.brandId){
+        validation.push("Brand Id is required")
+    }
+
     if(validation.length>0){
         res.json({
             status:422,
@@ -32,22 +34,15 @@ addProduct=(req,res)=>{
             message:validation
         }) 
     }else{
-        product.findOne({productName:req.body.productName})
-        .then((productData)=>{
-            if(!productData){
             let productObj=new product()
             productObj.productName=req.body.productName
             productObj.price=req.body.price
             productObj.description=req.body.description
             productObj.size=req.body.size
             productObj.categoryId=req.body.categoryId;
-            // console.log(req.files);
-            // req.files.forEach((el, index)=>{
-            //     console.log(el.filename)
-            //     let filename="products/"+el.filename
-            //     productObj.productImages.push(filename)
-            // })
-            productObj.productImage="products/"+req.file.filename
+            productObj.brandId=req.body.brandId
+            
+            productObj.productImage=req.body.productImage
             productObj.save()
             .then((productData)=>{
                 res.json({
@@ -65,59 +60,26 @@ addProduct=(req,res)=>{
                     error:err
                 })
             })
-            }else{
-                res.json({
-                    status:200,
-                    success:false,
-                    message:"Data exist with same name",
-                    data:productData
-                }) 
-            }
-
-        })
-        .catch((err)=>{
-            res.json({
-                status:500,
-                success:false,
-                message:"Internal server error",
-                errors:err
-            })
-        }) 
     }
     
 }
 
-getAllProduct= async(req,res)=>{
+
+getAllProduct=async (req,res)=>{
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
     let total = await product.countDocuments().exec()
-    console.log(total)
-    product.find(req.body)
-    .sort({createdAt : -1})
-    .skip(2)
-    .limit(1)
-    .then((result)=>{
-        res.json({
-            status:200,
-            success:true,
-            message:"Data Loaded",
-            data:result
-        })
-    })
-    .catch((err)=>{
-        res.json({
-            status:500,
-            success:false,
-            message:"Interval server error",
-            error:err
-        })
-    })
-}
-getAllProduct=(req,res)=>{
-    product.find().populate("categoryId")
+    delete req.body.limit
+    delete req.body.currentPage
+    product.find(req.body).populate("categoryId").populate("brandId")
+    .limit(limit)
+    .skip(currentPage*limit)
     .then((productData)=>{
         res.json({
             status:200,
             success:true,
             message:"Data Loaded",
+            total:total,
             data:productData
         })
     })
@@ -143,6 +105,7 @@ getSingleProduct=(req,res)=>{
         })
     }else{
         product.findOne({_id:req.body._id})
+        .populate("brandId").populate("categoryId")
         .then((productData)=>{
             if(!productData){
                 res.json({
@@ -170,66 +133,7 @@ getSingleProduct=(req,res)=>{
         })
     }
 }
-// deleteProduct=(req,res)=>{
-//     let validation=[]
-//     if(!req.body._id){
-//         validation.push("_id is required")
-//     }
-//     if(validation.length>0){
-//         res.json({
-//             status:422,
-//             success:false,
-//             message:validation
-//         })
-//     }else{
-//         product.deleteOne({_id:req.body._id})
-//         .then((result)=>{
-//             res.json({
-//                 status:200,
-//                 success:true,
-//                 message:"Data Deleted successfully",
-//             })
-//         })
-//         .catch((err)=>{
-//             res.json({
-//                 status:500,
-//                 success:false,
-//                 message:"Internal server error",
-//                 errors:err
-//             })
-//         })
-//     }    
-// }
-// deleteProductByParam=(req,res)=>{
-//     let validation=[]
-//     if(!req.params._id){
-//         validation.push("id is required")
-//     }
-//     if(validation.length>0){
-//         res.json({
-//             status:422,
-//             success:false,
-//             message:validation
-//         })
-//     }else{
-//         product.deleteOne({_id:req.params._id})
-//         .then((result)=>{
-//             res.json({
-//                 status:200,
-//                 success:true,
-//                 message:"Data Deleted successfully"
-//             })
-//         })
-//         .catch((err)=>{
-//             res.json({
-//                 status:500,
-//                 success:false,
-//                 message:"Internal server error",
-//                 errors:err
-//             })
-//         })
-//     }    
-// }
+
 updateProduct=(req,res)=>{
     let validation=[]
     if(!req.body._id){
@@ -263,11 +167,16 @@ updateProduct=(req,res)=>{
                 if(req.body.price){
                     productData.price=req.body.price
                 }
-                if(req.file){ 
-                    let filepath="public/"+productData.productImage
-                    fs.unlinkSync(filepath)
-                    productData.productImage="products/"+req.file.filename
+                if(req.body.categoryId){
+                    productData.categoryId=req.body.categoryId
                 }
+                if(req.body.brandId){
+                    productData.brandId=req.body.brandId
+                }
+                if(req.body.productImage){
+                    productData.productImage=req.body.productImage
+                }
+                
                 productData.save()
                 .then((updateData)=>{
                     res.json({
@@ -298,7 +207,7 @@ updateProduct=(req,res)=>{
     }
 
 }
-softDeleteProduct=(req,res)=>{
+changeStatus=(req,res)=>{
     let validation=""
     if(!req.body._id){
         validation+="_id is required"
@@ -319,7 +228,7 @@ softDeleteProduct=(req,res)=>{
                     message:"No data found on this given id"
                 })
             }else{
-                productData.status=false
+                productData.status=req.body.status
                 productData.save()
                 .then((result)=>{
                     res.json({
@@ -349,4 +258,4 @@ softDeleteProduct=(req,res)=>{
         })
     }
 }
-module.exports={addProduct, getAllProduct, getSingleProduct, updateProduct, softDeleteProduct}
+module.exports={addProduct, getAllProduct, getSingleProduct, updateProduct, changeStatus}

@@ -96,4 +96,146 @@ register=(req,res)=>{
         })
     }
 }
-module.exports={register}
+
+getSingleCustomer=(req,res)=>{
+    let validation=[]
+    if(!req.body.userId){
+        validation.push("userId is require")
+    }
+    if(validation.length>0){
+        res.json({
+            status:422,
+            success:false,
+            message:validation
+        })
+    }
+    else{
+        customer.findOne({userId:req.body.userId})
+        .populate("userId")
+        .then((userData)=>{
+            if(!userData){
+                res.json({
+                    status:200,
+                    success:false,
+                    message:"No data found on this given id"
+                })
+            }else{
+                res.json({
+                    status:200,
+                    success:true,
+                    message:"Data found",
+                    data:userData
+                })
+            }
+        })
+        .catch((err)=>{
+            res.json({
+                status:500,
+                success:false,
+                message:"Internal server error",
+                errors:err
+            })
+        })
+    }
+}
+
+getAllCustomers=async (req,res)=>{
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
+    let total = await customer.countDocuments().exec()
+    delete req.body.limit
+    delete req.body.currentPage
+    customer.find(req.body)
+    .populate({path:"userId", select:"name email"})
+    .limit(limit)
+    .skip(currentPage*limit)
+    .then((result)=>{
+            res.json({
+                status:200,
+                success:true,
+                message:"Data Loaded",
+                total:total,
+                data:result
+            }) 
+    })
+    .catch((err)=>{
+        res.json({
+            status:500,
+            success:false,
+            message:"Internal server error",
+            errors:err
+        })
+    }) 
+}
+updateCustomer=(req,res)=>{
+    let validation=[]
+    if(!req.body._id){
+        validation.push("id is required")
+    }
+    if(validation.length>0){
+        res.json({
+            status:422,
+            success:false,
+            message:validation
+        })
+    }else{
+        customer.findOne({_id:req.body._id})
+        .then((customerData)=>{
+            if(!customerData){
+                res.json({
+                    status:404,
+                    success:false,
+                    message:"No Order found on this given Id"
+                })
+            }else{
+                if(req.body.name){
+                    customerData.name=req.body.name
+                }
+                if(req.body.email){
+                    customerData.email=req.body.email
+                }
+                if(req.body.password){
+                    customerData.password=req.body.password
+                }
+                if(req.body.address){
+                    productData.address=req.body.address
+                }
+                if(req.body.pincode){
+                    customerData.pincode=req.body.pincode
+                }
+                if(req.body.contact){
+                    customerData.contact=req.body.contact
+                }
+                if(req.body.userType){
+                    customerData.userType=req.body.userType
+                }
+                customerData.save()
+                .then((updateData)=>{
+                    res.json({
+                        status:200,
+                        success:true,
+                        message:"Customer Detail Updated",
+                        data:updateData
+                    })
+                })
+                .catch((err)=>{
+                    res.json({
+                        status:500,
+                        success:false,
+                        message:"Internal server error",
+                        errors:err
+                    })
+                }) 
+            }
+        })
+        .catch((err)=>{
+            res.json({
+                status:500,
+                success:false,
+                message:"Internal server error",
+                errors:err
+            })
+        }) 
+    }
+}
+module.exports={register, getSingleCustomer, getAllCustomers, updateCustomer}

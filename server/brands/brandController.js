@@ -8,8 +8,11 @@ addBrand=(req,res)=>{
     if(!req.body.description){
         validation.push('description is Required')
     }
-    if(!req.file){
+    if(!req.body.brandLogo){
         validation.push("Brand Logo is require")
+    }
+    if(!req.body.brandType){
+        validation.push("Brand Type is require")
     }
     if(validation.length>0){
         res.json({
@@ -27,8 +30,9 @@ addBrand=(req,res)=>{
                 // console.log(brandObj);
                 brandObj.brandName=req.body.brandName
                 brandObj.description=req.body.description
-                brandObj.brandLogo="brands/"+req.file.filename
-            
+                brandObj.brandType=req.body.brandType
+                brandObj.brandLogo=req.body.brandLogo
+                // brandObj.brandLogo="brands/"+req.file.filename
                 brandObj.save()
                 .then((brandData)=>{
                     res.json({
@@ -69,17 +73,22 @@ addBrand=(req,res)=>{
 }
 
 getAllBrand=async (req,res)=>{
+    // console.log(req.body)
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
     let total = await brand.countDocuments().exec()
-    console.log(total)
-    brand.find(req.body)
-    // .sort({createdAt: -1})
-    // .skip(4)
-    // .limit(5)
+    delete req.body.limit 
+    delete req.body.currentPage
+    // console.log(req.body)
+   brand.find(req.body)
+   .limit(limit)
+   .skip(currentPage*limit)
     .then((result)=>{
         res.json({
             status:200,
             success:true,
             message:"Data Loaded",
+            total:total,
             data:result
         })
     })
@@ -92,8 +101,7 @@ getAllBrand=async (req,res)=>{
         })
     })
 }
-//getSingle 
-//unique- id(single, update, delete)
+
 getSingleBrand=(req,res)=>{
     brand.findOne(req.body)
     let validation=[]
@@ -136,70 +144,38 @@ getSingleBrand=(req,res)=>{
         })
     }
 }
-// delele
-// permanent delete
-// soft delete
-// deleteBrand=(req, res)=>{
-//     let validation=[]
-//     if (!req.body.id){
-//         validation.push("_id is required")
-//     }
-//     if(validation.length>0){
-//         res.json({
-//             status:422,
-//             success:false,
-//             message:validation
-//         })
-//     }else{
-//         brand.deleteOne({_id:req.body.id})
-//         .then((result)=>{
-//             res.json({
-//                 status:200,
-//                 success:true,
-//                 message:"Data Deleted successfully",
-//             })
-//         })
-//         .catch((err)=>{
-//             res.json({
-//                 status:500,
-//                 success:false,
-//                 message:"Internal server error",
-//                 errors:err
-//             })
-//         })
-//     }
-// }
-// deleteBrandByParam=(req,res)=>{
-//         console.log( req.params._id);
-//         let validation=[]
-//         if(!req.params._id){
-//             validation.push("_id is required")
-//         }
-//         if(validation.length>0){
-//             res.json({
-//                 status:422,
-//                 success:false,
-//                 message:validation
-//             })
-//         }else{
-//             brand.deleteOne({_id:req.params._id})
-//             .then((result)=>{
-//                 res.json({
-//                     status:200,
-//                     success:true,
-//                     message:"Data deleted successfully"
-//                 })
-//             })
-//             .catch((err)=>{
-//                 res.json({
-//                     status:500,
-//                     success:false,
-//                     message:"Internal server error",
-//                     errors:err
-//                 })
-//             })
-//         }    
-// }
+
+deleteBrandByParam=(req,res)=>{
+        console.log( req.params._id);
+        let validation=[]
+        if(!req.params._id){
+            validation.push("_id is required")
+        }
+        if(validation.length>0){
+            res.json({
+                status:422,
+                success:false,
+                message:validation
+            })
+        }else{
+            brand.deleteOne({_id:req.params._id})
+            .then((result)=>{
+                res.json({
+                    status:200,
+                    success:true,
+                    message:"Data deleted successfully"
+                })
+            })
+            .catch((err)=>{
+                res.json({
+                    status:500,
+                    success:false,
+                    message:"Internal server error",
+                    errors:err
+                })
+            })
+        }    
+}
 updateBrand=(req,res)=>{
         let validation=[]
         if(!req.body._id){
@@ -229,11 +205,17 @@ updateBrand=(req,res)=>{
                     if(req.body.description){
                         brandData.description=req.body.description
                     }
-                    if(req.file){
-                        let filepath="public/"+brandData.brandLogo
-                        fs.unlinkSync(filepath)
-                        brandData.bandLogo="brands/"+req.file.filename
+                    if(req.body.brandType){
+                        brandData.brandType=req.body.brandType
                     }
+                    if(req.body.brandLogo){
+                        brandData.brandLogo=req.body.brandLogo
+                    }
+                    // if(req.file){
+                    //     // let filepath="public/"+brandData.brandLogo
+                    //     // fs.unlinkSync(filepath)
+                    //     // brandData.bandLogo="brands/"+req.file.filename
+                    // }
                     brandData.save()
                     .then((updateData)=>{
                         res.json({
@@ -263,7 +245,7 @@ updateBrand=(req,res)=>{
             })
         }
 }
-softDeleteBrand=(req,res)=>{
+changeStatus=(req,res)=>{
     let validation=""
     if(!req.body._id){
         validation+="_id is required"
@@ -285,13 +267,13 @@ softDeleteBrand=(req,res)=>{
                 message:"No data found at the given id"
             })
            }else{
-            brandData.status=false
+            brandData.status=req.body.status
             brandData.save()
             .then((result)=>{
                 res.json({
                     status:200,
                     success:true,
-                    message:"Brand soft deleted",
+                    message:"Change Brand Status",
                     data:result
                 })
             }).catch((err)=>{
@@ -315,4 +297,4 @@ softDeleteBrand=(req,res)=>{
     }
 }
 
-module.exports={addBrand, getAllBrand, getSingleBrand, updateBrand, softDeleteBrand}
+module.exports={addBrand, getAllBrand, getSingleBrand, updateBrand, changeStatus, deleteBrandByParam}

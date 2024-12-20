@@ -6,6 +6,7 @@ const brandSchema=mongoose.Schema({
     brandName:{type:String, default:""},
     description:{type:String, default:""},
     brandLogo:{type:String, default:"no-pic.jpg"},
+    brandType:{type:Number, default:"1"},
     status:{type:Boolean, default:true},
     createdAt:{type:Date, default:Date.now()}
 })

@@ -1,3 +1,4 @@
+
 const category=require("./categoryModel")
 const fs=require("fs")
 addCategory=(req,res)=>{
@@ -8,11 +9,11 @@ addCategory=(req,res)=>{
     if(!req.body.description){
         validation.push("description is required")
     }
-    // if(!req.body.brandId){
-    //     validation.push("Brand Id is required")
-    // }
-    if(!req.file){
-        validation.push("Category is required")
+    if(!req.body.brandId){
+        validation.push("Brand Id is required")
+    }
+    if(!req.body.categoryImage){
+        validation.push("Category Image is required")
     }
     
     if(validation.length>0){
@@ -22,14 +23,12 @@ addCategory=(req,res)=>{
             message:validation
         })   
     }else{
-        category.findOne({categoryName:req.body.categoryName})
-        .then((categoryData)=>{
-            if(!categoryData){
+       
             let categoryObj=new category()
             categoryObj.categoryName=req.body.categoryName
             categoryObj.description=req.body.description
             categoryObj.brandId=req.body.brandId
-            categoryObj.category="categories/"+req.file.filename
+            categoryObj.categoryImage=req.body.categoryImage
         
             categoryObj.save()
                 .then((categoryData)=>{
@@ -48,62 +47,28 @@ addCategory=(req,res)=>{
                         error:err
                     })
                 })
-            }else{
-                res.json({
-                    status:500,
-                    success:false,
-                    message:"Data exist with same names"
-                })
-            }
-        })
-        .catch((err)=>{
-            res.json({
-                status:500,
-                success:false,
-                message:"Internal server error",
-                error:err
-            })
-        })
+   
     }     
 }
-// getAllCategory= async (req,res)=>{
-//     let total = await category.countDocuments().exec()
-//     console.log(total)
-//     category.find(req.body)
-//     .sort({createdAt : -1})
-//     .skip(3)
-//     .limit(1)
-//     .then((result)=>{
-//         res.json({
-//             status:200,
-//             success:true,
-//             message:"Data Loaded",
-//             data:result
-//         })
-//     })
-//     .catch((err)=>{
-//         res.json({
-//             status:500,
-//             success:false,
-//             message:"Internal Server Error",
-//             errors:err
-//         })
-//     })
-// }
-getAllCategory = (req,res)=>{
-    category.find().populate("brandId")
-    // let total = await category.countDocuments().exec()
-    // console.log(total)
-    category.find(req.body)
-    // .sort({createdAt : -1})
-    // .skip(2)
-    // .limit(1)
+
+getAllCategory =async (req,res)=>{
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
+    let total = await category.countDocuments().exec()
+    delete req.body.limit
+    delete req.body.currentPage
+    category.find(req.body).populate("brandId")
+    .limit(limit)
+    .skip(currentPage*limit)
     .then((result)=>{
+        // console.log(result)
         res.json({
             status:200,
             success:true,
             message:"Data Loaded",
+            total:total,
             data:result
+
             })
         })
         .catch((err)=>{
@@ -129,6 +94,7 @@ getSingleCategory=(req,res)=>{
     }
     else{
         category.findOne({_id:req.body._id})
+        .populate("brandId")
         .then((categoryData)=>{
             if(!categoryData){
                 res.json({
@@ -155,66 +121,7 @@ getSingleCategory=(req,res)=>{
         })
     }
 }
-// deleteCategory=(req,res)=>{
-//     let validation=[]
-//     if(!req.body._id){
-//         validation.push("id is require")
-//     }
-//     if(validation.length>0){
-//         res.json({
-//             status:422,
-//             success:false,
-//             message:validation
-//         })
-//     }else{
-//         category.deleteOne({_id:req.body._id})
-//         .then((result)=>{
-//             res.json({
-//                 status:200,
-//                 success:true,
-//                 message:"Data Deleted successfully"
-//             })
-//         })
-//         .catch((err)=>{
-//             res.json({
-//                 ststus:500,
-//                 success:false,
-//                 message:"Internal server error",
-//                 errors:err
-//             })
-//         })
-//     }
-// }
-// deleteCategoryByParam=(req,res)=>{
-//     let validation=[]
-//     if(!req.params._id){
-//         validation.push("id is require")
-//     }
-//     if(validation.length>0){
-//         res.json({
-//             status:422,
-//             success:false,
-//             message:validation
-//         })
-//     }else{
-//         category.deleteOne({_id:req.params._id})
-//         .then((result)=>{
-//             res.json({
-//                 status:200,
-//                 success:true,
-//                 message:"Data Deleted successfully"
-//             })
-//         })
-//         .catch((err)=>{
-//             res.json({
-//                 ststus:500,
-//                 success:false,
-//                 message:"Internal server error",
-//                 errors:err
-//             })
-//         })
-//     }
-// }
+
 updateCategory=(req,res)=>{
     let validation=[]
     if(!req.body._id){
@@ -243,11 +150,10 @@ updateCategory=(req,res)=>{
                 if(req.body.description){
                     categoryData.description=req.body.description
                 }
-                if(req.file){ 
-                    let filepath="public/"+categoryData.category
-                    fs.unlinkSync(filepath)
-                    categoryData.category="categories/"+req.file.filename
+                if(req.body.categoryImage){
+                categoryData.categoryImage=req.body.categoryImage
                 }
+                
                 categoryData.save()
                 .then((updateData)=>{
                     res.json({
@@ -277,7 +183,7 @@ updateCategory=(req,res)=>{
         })
     }
 }
-softDeleteCategory=(req,res)=>{
+changeStatus=(req,res)=>{
     let validation=""
     if(!req.body._id){
         validation+="id is required"
@@ -298,7 +204,7 @@ softDeleteCategory=(req,res)=>{
                     message:"No data found on this given id"
                 })
             }else{
-                categoryData.status=false
+                categoryData.status=req.body.status
                 categoryData.save()
                 .then((result)=>{
                     res.json({
@@ -328,4 +234,4 @@ softDeleteCategory=(req,res)=>{
         })
     }
 }
-module.exports={addCategory, getAllCategory, getSingleCategory, updateCategory, softDeleteCategory}
+module.exports={addCategory, getAllCategory, getSingleCategory, updateCategory, changeStatus}
