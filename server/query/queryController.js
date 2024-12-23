@@ -1,5 +1,6 @@
-const enquiry=require("./EnquiryModel")
-addEnquiry=(req,res)=>{
+const query=require("./queryModel")
+const fs=require('fs')
+addQuery=(req,res)=>{
     let validation=[]
     if(!req.body.name){
         validation.push("Name is required")
@@ -20,21 +21,21 @@ addEnquiry=(req,res)=>{
             message:validation
         })
     }else{
-        enquiry.findOne({email:req.body.email})
-        .then((enquiryData)=>{
-            if(!enquiryData){
-                let enquiryObj=new enquiry()
-                enquiryObj.name=req.body.name
-                enquiryObj.email=req.body.email
-                enquiryObj.subject=req.body.subject
-                enquiryObj.message=req.body.message
-                enquiryObj.save()
-                .then((enquiryData)=>{
+        // query.findOne({userId:req.body.userId})
+        // .then((queryData)=>{
+        //     if(!queryData){
+                let queryObj=new query()
+                queryObj.name=req.body.name
+                queryObj.email=req.body.email
+                queryObj.subject=req.body.subject
+                queryObj.message=req.body.message
+                queryObj.save()
+                .then((queryData)=>{
                     res.json({
                         status:200,
                         success:true,
-                        message:"Enquiry Added",
-                        data:enquiryData
+                        message:"Query Added",
+                        data:queryData
                     })
                 })
                 .catch((err)=>{
@@ -45,31 +46,31 @@ addEnquiry=(req,res)=>{
                         errors:err
                     }) 
                 })
-            }else{
-                res.json({
-                    status:200,
-                    success:false,
-                    message:"No any enquiry is pending"
-                })
-            }
-        })
-        .catch((err)=>{
-            res.json({
-                status:500,
-                success:false,
-                message:"Internal server error",
-                errors:err
-            })
-        })
+        //     }else{
+        //         res.json({
+        //             status:200,
+        //             success:false,
+        //             message:"No any query is pending"
+        //         })
+        //     }
+        // })
+        // .catch((err)=>{
+        //     res.json({
+        //         status:500,
+        //         success:false,
+        //         message:"Internal server error",
+        //         errors:err
+        //     })
+        // })
     }
 }
 getAll=(req,res)=>{
-    enquiry.find({userId:req.body.userId})
+    query.find(req.body).populate("userId")
     .then((result)=>{
             res.json({
                 status:200,
                 success:true,
-                message:"Enquiries Loaded",
+                message:"Quiries Loaded",
                 data:result
             }) 
     })
@@ -82,7 +83,7 @@ getAll=(req,res)=>{
         })
     }) 
 }
-deleteEnquiry=(req,res)=>{
+deleteQuery=(req,res)=>{
     let validation=[]
     if(!req.body._id){
         validation.push("id is required")
@@ -94,12 +95,12 @@ deleteEnquiry=(req,res)=>{
             message:validation
         })
     }else{
-        enquiry.deleteOne({_id:req.body._id})
+        query.deleteOne({_id:req.body._id})
         .then((result)=>{
             res.json({
                 status:200,
                 success:true,
-                message:"Enquiry deleted",
+                message:"Query deleted",
                 data:result
             })
         })
@@ -113,4 +114,4 @@ deleteEnquiry=(req,res)=>{
         })
     }
 }  
-module.exports={addEnquiry,getAll,deleteEnquiry}
+module.exports={addQuery,getAll,deleteQuery}

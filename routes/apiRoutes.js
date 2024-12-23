@@ -8,6 +8,7 @@ const customerController=require("../server/customer/customerController")
 const userController=require("../server/users/userController")
 const dashboardController=require("../server/dashboard/DashboardController")
 const orderController=require("../server/order/OrderController")
+const queryController=require("../server/query/queryController")
 
 // router.method("/path", controller.module)
 router.post("/getAllBrands", brandController.getAllBrand)
@@ -83,5 +84,10 @@ router.post("/getAllOrders", orderController.getAllOrders)
 router.post("/getSingleOrder", orderController.getSingleOrder)
 router.post("/updateOrder", orderController.updateOrder)
 
+//queries api
+
+router.post("/addQuery", queryController.addQuery)
+router.post("/getAll", queryController.getAll)
+router.post("/deleteQuery", queryController.deleteQuery)
 module.exports=router
 

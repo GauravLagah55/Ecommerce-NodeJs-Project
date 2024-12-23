@@ -41,7 +41,6 @@ addProduct=(req,res)=>{
             productObj.size=req.body.size
             productObj.categoryId=req.body.categoryId;
             productObj.brandId=req.body.brandId
-            
             productObj.productImage=req.body.productImage
             productObj.save()
             .then((productData)=>{

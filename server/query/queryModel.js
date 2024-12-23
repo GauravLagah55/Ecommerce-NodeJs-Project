@@ -1,5 +1,5 @@
 const mongoose=require("mongoose")
-const enquirySchema=mongoose.Schema({
+const querySchema=mongoose.Schema({
     name:{type:String, default:""},
     email:{type:String, default:""},
     subject:{type:String, default:""},
@@ -7,4 +7,4 @@ const enquirySchema=mongoose.Schema({
     status:{type:Boolean, default:true},
     createdAt:{type:Date, default:Date.now()}
 })
-module.exports=mongoose.model("EnquiryModel", enquirySchema)
+module.exports=mongoose.model("queryModel", querySchema)
