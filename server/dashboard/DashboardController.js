@@ -3,18 +3,21 @@ const category=require("../category/categoryModel")
 const product=require("../products/productModel")
 const user=require("../users/userModel")
 const order=require("../order/OrderModel")
+const query=require("../query/QueryModel")
 dashboard=async(req,res)=>{
     let brandTotal=0
     let categoryTotal=0
     let productTotal=0
     let userTotal=0
     let orderTotal=0
+    let queryTotal=0
    
     brandTotal=await brand.countDocuments({status:true}).exec()
     categoryTotal=await category.countDocuments().exec()
     productTotal=await product.countDocuments().exec()
     userTotal=await user.countDocuments().exec()
     orderTotal=await order.countDocuments().exec()
+    queryTotal=await query.countDocuments().exec()
     res.json({
         status:200,
         success:true,
@@ -24,6 +27,7 @@ dashboard=async(req,res)=>{
         totalProduct:productTotal,
         totalUser:userTotal,
         totalOrder:orderTotal,
+        totalQuery:queryTotal
     })
 }
 module.exports={dashboard}

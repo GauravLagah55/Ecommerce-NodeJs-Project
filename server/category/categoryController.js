@@ -1,5 +1,6 @@
 
 const category=require("./categoryModel")
+const brand=require("../brands/brandModel")
 const fs=require("fs")
 addCategory=(req,res)=>{
     let validation=[]
@@ -23,31 +24,50 @@ addCategory=(req,res)=>{
             message:validation
         })   
     }else{
-       
-            let categoryObj=new category()
-            categoryObj.categoryName=req.body.categoryName
-            categoryObj.description=req.body.description
-            categoryObj.brandId=req.body.brandId
-            categoryObj.categoryImage=req.body.categoryImage
-        
-            categoryObj.save()
-                .then((categoryData)=>{
+            brand.findOne({brandName:req.body.brandName})
+            category.findOne({categoryName:req.body.categoryName})
+            .then((categoryData)=>{
+                if(!categoryData ){
+                    let categoryObj=new category()
+                    categoryObj.categoryName=req.body.categoryName
+                    categoryObj.description=req.body.description
+                    categoryObj.brandId=req.body.brandId
+                    categoryObj.categoryImage=req.body.categoryImage
+                    categoryObj.save()
+                        .then((categoryData)=>{
+                            res.json({
+                                status:200,
+                                success:true,
+                                message:"category added",
+                                data:categoryData
+                            })
+                        })    
+                        .catch((err)=>{
+                            res.json({
+                                status:404,
+                                success:false,
+                                message:"server error",
+                                error:err
+                            })
+                        })
+                }else{
                     res.json({
                         status:200,
-                        success:true,
-                        message:"category added",
+                        success:false,
+                        message:"Data exist with same name",
                         data:categoryData
                     })
-                })    
-                .catch((err)=>{
-                    res.json({
-                        status:404,
-                        success:false,
-                        message:"server error",
-                        error:err
-                    })
+                }
+            })
+            .catch((err)=>{
+                res.json({
+                    status:404,
+                    success:false,
+                    message:"server error",
+                    error:err
                 })
-   
+            })
+            
     }     
 }
 
@@ -210,7 +230,7 @@ changeStatus=(req,res)=>{
                     res.json({
                         status:200,
                         success:true,
-                        message:"Data soft deleted",
+                        message:"Status Changed",
                         data:result
                     })
                 })

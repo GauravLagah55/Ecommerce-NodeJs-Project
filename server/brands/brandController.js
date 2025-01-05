@@ -80,7 +80,7 @@ getAllBrand=async (req,res)=>{
     delete req.body.limit 
     delete req.body.currentPage
     // console.log(req.body)
-   brand.find(req.body)
+    brand.find(req.body)
    .limit(limit)
    .skip(currentPage*limit)
     .then((result)=>{
@@ -211,11 +211,7 @@ updateBrand=(req,res)=>{
                     if(req.body.brandLogo){
                         brandData.brandLogo=req.body.brandLogo
                     }
-                    // if(req.file){
-                    //     // let filepath="public/"+brandData.brandLogo
-                    //     // fs.unlinkSync(filepath)
-                    //     // brandData.bandLogo="brands/"+req.file.filename
-                    // }
+                    
                     brandData.save()
                     .then((updateData)=>{
                         res.json({

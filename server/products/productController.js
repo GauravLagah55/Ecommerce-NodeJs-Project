@@ -233,7 +233,7 @@ changeStatus=(req,res)=>{
                     res.json({
                         status:200,
                         success:true,
-                        message:"Data soft deleted",
+                        message:"Status Changed",
                         data:result
                     })
                 })

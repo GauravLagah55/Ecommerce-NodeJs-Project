@@ -8,7 +8,7 @@ const customerController=require("../server/customer/customerController")
 const userController=require("../server/users/userController")
 const dashboardController=require("../server/dashboard/DashboardController")
 const orderController=require("../server/order/OrderController")
-const queryController=require("../server/query/queryController")
+const queryController=require("../server/query/QueryController")
 
 // router.method("/path", controller.module)
 router.post("/getAllBrands", brandController.getAllBrand)
@@ -34,6 +34,7 @@ const customerUpload = multer({storage: customerStorage})
 
 router.post("/register", customerUpload.fields([{name:"adhaarImage", maxCount:1}, {name:"residentialProofImage", maxCount:1}]), customerController.register)
 router.post("/login", userController.login)
+router.post("/addQuery", queryController.addQuery)
 
 //with token
 router.use(require("../config/midddleware"))
@@ -45,19 +46,19 @@ router.delete("/deleteByParam/:_id", brandController.deleteBrandByParam)
 router.post("/updateBrand", brandController.updateBrand)
 router.post("/changeStatus", brandController.changeStatus)
 
-//product apis
-
-
-router.post("/addProduct", productController.addProduct)
-router.post("/updateProduct", productController.updateProduct)
-router.post("/changeStatus", productController.changeStatus)
-
 //category apis
-
 
 router.post("/addCategory",  categoryController.addCategory)
 router.post("/updateCategory", categoryController.updateCategory)
-router.post("/changeStatus", categoryController.changeStatus)
+router.post("/changeCategoryStatus", categoryController.changeStatus)
+
+//product apis
+
+router.post("/addProduct", productController.addProduct)
+router.post("/updateProduct", productController.updateProduct)
+router.post("/changeProductStatus", productController.changeStatus)
+
+
 
 //customer or user api 
 router.post("/changePassword", userController.changePassword)
@@ -86,7 +87,6 @@ router.post("/updateOrder", orderController.updateOrder)
 
 //queries api
 
-router.post("/addQuery", queryController.addQuery)
 router.post("/getAll", queryController.getAll)
 router.post("/deleteQuery", queryController.deleteQuery)
 module.exports=router

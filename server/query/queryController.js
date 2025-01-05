@@ -1,4 +1,5 @@
-const query=require("./queryModel")
+
+const query=require("./QueryModel")
 const fs=require('fs')
 addQuery=(req,res)=>{
     let validation=[]
@@ -21,9 +22,7 @@ addQuery=(req,res)=>{
             message:validation
         })
     }else{
-        // query.findOne({userId:req.body.userId})
-        // .then((queryData)=>{
-        //     if(!queryData){
+        
                 let queryObj=new query()
                 queryObj.name=req.body.name
                 queryObj.email=req.body.email
@@ -46,26 +45,19 @@ addQuery=(req,res)=>{
                         errors:err
                     }) 
                 })
-        //     }else{
-        //         res.json({
-        //             status:200,
-        //             success:false,
-        //             message:"No any query is pending"
-        //         })
-        //     }
-        // })
-        // .catch((err)=>{
-        //     res.json({
-        //         status:500,
-        //         success:false,
-        //         message:"Internal server error",
-        //         errors:err
-        //     })
-        // })
+        
     }
 }
-getAll=(req,res)=>{
-    query.find(req.body).populate("userId")
+getAll= async(req,res)=>{
+    let limit=req.body.limit
+    let currentPage= req.body.currentPage-1
+    let total = await query.countDocuments().exec()
+    delete req.body.limit
+    delete req.body.currentPage
+    query.find(req.body)
+    .limit(limit)
+    .skip(currentPage*limit)
+    // query.find()
     .then((result)=>{
             res.json({
                 status:200,
@@ -83,7 +75,8 @@ getAll=(req,res)=>{
         })
     }) 
 }
-deleteQuery=(req,res)=>{
+deleteQuery= async(req,res)=>{
+    
     let validation=[]
     if(!req.body._id){
         validation.push("id is required")
@@ -92,6 +85,7 @@ deleteQuery=(req,res)=>{
         res.json({
             status:422,
             success:false,
+            total:total,
             message:validation
         })
     }else{

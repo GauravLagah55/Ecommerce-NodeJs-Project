@@ -28,6 +28,14 @@ app.get("/", (req, res)=>{
     })
 })
 
+const http = require('http');
+
+// Create a server object
+http.createServer(function (req, res) {
+    res.write('Hello World!'); 
+    res.end();
+}).listen(3000);
+
 //postman- api testing interface
 //api= application programming interface, mediator for frontend and backend
 //node js- backend- hindi
